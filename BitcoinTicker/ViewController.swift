@@ -14,6 +14,8 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
     
     let baseURL = "https://apiv2.bitcoinaverage.com/indices/global/ticker/BTC"
     let currencyArray = ["AUD", "BRL","CAD","CNY","EUR","GBP","HKD","IDR","ILS","INR","JPY","MXN","NOK","NZD","PLN","RON","RUB","SEK","SGD","USD","ZAR"]
+    let currencySymbolArray = ["$", "R$", "$", "¥", "€", "£", "$", "Rp", "₪", "₹", "¥", "$", "kr", "$", "zł", "lei", "₽", "kr", "$", "$", "R"]
+    var selectedCurrencySymbol: String?
     var finalURL = ""
 
     //Pre-setup IBOutlets
@@ -48,6 +50,7 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
         
         finalURL = baseURL + currencyArray[row]
         print(finalURL)
+        selectedCurrencySymbol = currencySymbolArray[row]
         getBitcoinData(url: finalURL)
     }
     
@@ -59,17 +62,17 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
     func getBitcoinData(url: String) {
         
         Alamofire.request(url, method: .get)
-            .responseJSON { response in
+            .responseJSON { [weak self] response in
                 if response.result.isSuccess {
 
                     print("Sucess! Got the bitcoin data")
                     let bitcoinJSON : JSON = JSON(response.result.value!)
 
-                    self.updateBitcoinData(json: bitcoinJSON)
+                    self?.updateBitcoinData(json: bitcoinJSON)
 
                 } else {
                     print("Error: \(String(describing: response.result.error))")
-                    self.bitcoinPriceLabel.text = "Connection Issues"
+                    self?.bitcoinPriceLabel.text = "Connection Issues"
                 }
             }
 
@@ -81,8 +84,9 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
     /***************************************************************/
     
     func updateBitcoinData(json : JSON) {
-        if let bitcoinResult = json["ask"].double {
-            self.bitcoinPriceLabel.text = String(bitcoinResult)
+        if let bitcoinResult = json["ask"].double,
+            let selectedCurrencySymbol = selectedCurrencySymbol {
+            self.bitcoinPriceLabel.text = selectedCurrencySymbol + String(bitcoinResult)
         } else {
             self.bitcoinPriceLabel.text = "Connection Issues"
         }
