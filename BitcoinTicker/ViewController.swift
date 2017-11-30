@@ -31,7 +31,7 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
     }
 
     
-    //UIPickerView delegate methods
+    // UIPickerView delegate methods
     
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1
@@ -54,31 +54,25 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
         getBitcoinData(url: finalURL)
     }
     
-    
-    
     //MARK: - Networking
     /***************************************************************/
     
     func getBitcoinData(url: String) {
-        
         Alamofire.request(url, method: .get)
             .responseJSON { [weak self] response in
                 if response.result.isSuccess {
-
+                    
                     print("Sucess! Got the bitcoin data")
                     let bitcoinJSON : JSON = JSON(response.result.value!)
-
+                    
                     self?.updateBitcoinData(json: bitcoinJSON)
-
+                    
                 } else {
                     print("Error: \(String(describing: response.result.error))")
                     self?.bitcoinPriceLabel.text = "Connection Issues"
                 }
-            }
-
+        }
     }
-    
-    
     
     //MARK: - JSON Parsing
     /***************************************************************/
@@ -91,7 +85,6 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
             self.bitcoinPriceLabel.text = "Connection Issues"
         }
     }
-
 
 }
 
